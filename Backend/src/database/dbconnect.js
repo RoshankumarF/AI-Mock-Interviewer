@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 //const 
 
-DB_NAME ="AI-INTERVIEWE-AGENT"
+const DB_NAME ="AI-INTERVIEWE-AGENT"
 
 const connectDB=async()=>{
     try {
