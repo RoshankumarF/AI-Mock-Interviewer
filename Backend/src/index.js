@@ -1,7 +1,7 @@
 import "dotenv/config"
 import dns from "node:dns"
 
-import { connectDB } from "./src/database/dbconnect.js"
+import { connectDB } from "./database/dbconnect.js"
 
 import { app } from "./app.js"
 
