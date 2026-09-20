@@ -147,7 +147,67 @@ const submitAnswer=asyncHandler(async(req,res)=>{
 
 })
 
+const endInterview=asyncHandler(async(req,res)=>{
+    const {sessionId}=req.params
+
+    if(!mongoose.Types.ObjectId.isValid(sessionId)){
+        throw new apiError(400,"Invalid session id")
+    }
+    const session=await Session.findById(sessionId)
+
+    if (!session) {
+    throw new apiError(404, "Session not found");
+  }
+  if (session.history.length === 0) {
+    throw new apiError(400, "Cannot end an interview with no answered questions");
+  }
+
+    const totalScore = session.history.reduce((sum, h) => sum + (h.score || 0), 0)
+  const averageScore = Math.round((totalScore / session.history.length) * 10) / 10
+
+
+  const summaryPrompt = `
+    Summarize this mock interview performance.
+    Topic: ${session.topic}, Role: ${session.role}, Difficulty: ${session.difficulty}
+
+    ${session.history.map((h, i) => `Q${i + 1}: ${h.question}\nAnswer: ${h.userAnswer}\nScore: ${h.score}/10`).join("\n\n")}
+
+    Respond ONLY in this JSON format, no markdown fences, no extra text:
+    {
+      "overallSummary": "2-3 sentence summary",
+      "topStrength": "one sentence",
+      "topAreaToImprove": "one sentence"
+    }
+  `
+
+
+  let summary;
+  try {
+    const rawSummary = await generateWithRetry(model, summaryPrompt)
+
+    summary = JSON.parse(rawSummary.replace(/```json|```/g, "").trim())
+  } catch (err) {
+    
+    summary = { overallSummary: "Summary unavailable, but your scores below are accurate.", topStrength: null, topAreaToImprove: null };
+  }
+
+
+  session.totalScore = averageScore
+  session.status = "completed"
+  session.currentQuestion = undefined
+  await session.save()
+
+  res.json({
+    totalScore: averageScore,
+    totalQuestions: session.history.length,
+    history: session.history,
+    summary,
+  });
+
+})
+
 export {
     startInterview,
-    submitAnswer
+    submitAnswer,
+    endInterview
 }
