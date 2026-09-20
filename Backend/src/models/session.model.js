@@ -13,6 +13,10 @@ const sessionSchema=new Schema({
     difficulty :{
         type:String
     },
+   role: {
+    type:String
+
+    },
     history:[
         {
            
