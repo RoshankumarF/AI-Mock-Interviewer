@@ -43,6 +43,8 @@ const startInterview =asyncHandler(async(req,res)=>{
 
 })
 
+const MAXQ=5;
+
 const submitAnswer=asyncHandler(async(req,res)=>{
     const {sessionId}=req.params
     const {answer}=req.body
@@ -54,11 +56,16 @@ const submitAnswer=asyncHandler(async(req,res)=>{
      if (!session) {
     throw new apiError(404, "Session not found");
   }
+   
+  if (session.status === "completed") {
+    throw new apiError(400, "This interview has already ended")
+  }
+
   if (!session.currentQuestion) {
     throw new apiError(400, "No active question on this session");
   }
 
-    const prompt = `
+    const evalprompt = `
   Review this answer to the question: "${session.question}"
   
   Candidate's answer: "${answer}"
@@ -72,24 +79,27 @@ const submitAnswer=asyncHandler(async(req,res)=>{
 
   IMPORTANT: Respond ONLY in this JSON format, no extra text:
   {
-    "score": 7,
-    "strengths": ["understood the concept", "good example"],
-    "missing": ["didn't mention edge cases"],
+    "score": <number 1-10>,
+    "strengths": ["", ""],
+    "missing": [""],
     "idealAnswer": "..."
   }
 
 
 `
 
-  const rawText = await generateWithRetry(model, prompt);
+  const rawFeedback = await generateWithRetry(model, evalPrompt);
 
   let feedback;
   try {
-    const cleaned = rawText.replace(/```json|```/g, "").trim();
-    feedback = JSON.parse(cleaned);
+    feedback = JSON.parse(rawFeedback.replace(/```json|```/g, "").trim());
   } catch (err) {
     throw new apiError(500, "AI response could not be parsed, please retry");
   }
+
+ 
+
+  
 
   session.history.push({
     question: session.currentQuestion,
@@ -98,12 +108,42 @@ const submitAnswer=asyncHandler(async(req,res)=>{
     missing: feedback.missing,
     idealAnswer: feedback.idealAnswer,
     score: feedback.score,
-  });
+  })
 
-  session.currentQuestion = undefined;
-  await session.save();
+  const questionAsked=session.history.length
+  const isLastQuestion=questionAsked >= MAXQ
 
-  res.json({ response: feedback });
+  let nextQuestion =null;
+
+  if(!isLastQuestion){
+    const askedSoFar =session.history.map((h)=>h.question).join("\n")
+   const nextPrompt = `
+      Ask a ${session.difficulty} level interview question about ${session.topic}.
+      The candidate is a ${session.role}.
+      This is question ${questionsAsked + 1} of ${MAX_QUESTIONS}.
+
+      Do NOT repeat or closely resemble these already-asked questions:
+      - ${askedSoFar}
+
+      Ask only ONE new question. Respond with ONLY the question text —
+      no preamble, no numbering.
+    `;
+
+    nextQuestion = await generateWithRetry(model, nextPrompt);
+    session.currentQuestion = nextQuestion;
+
+  }else{
+    session.currentQuestion=undefined
+  }
+
+  await session.save()
+
+  res.json({
+    feedback,
+    nextQuestion,        
+    questionsAsked,
+    isLastQuestion,       
+  })
 
 })
 
