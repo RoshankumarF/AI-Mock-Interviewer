@@ -106,3 +106,8 @@ const submitAnswer=asyncHandler(async(req,res)=>{
   res.json({ response: feedback });
 
 })
+
+export {
+    startInterview,
+    submitAnswer
+}
