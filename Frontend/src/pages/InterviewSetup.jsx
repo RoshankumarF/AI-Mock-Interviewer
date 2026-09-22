@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { api } from "../api";
 
 import Button from "../components/Button";
 import Select from "../components/Select";
@@ -52,7 +52,7 @@ export default function InterviewSetup() {
             [name]: "",
         }));
 
-        setApiError("");
+        setApiError("")
     };
 
     const handleDifficulty = (difficulty) => {
@@ -66,11 +66,11 @@ export default function InterviewSetup() {
             difficulty: "",
         }));
 
-        setApiError("");
+        setApiError("")
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors = {}
 
         if (!formData.role) {
             newErrors.role = "Please select an interview role." 
@@ -84,31 +84,29 @@ export default function InterviewSetup() {
             newErrors.difficulty = "Please select a difficulty." 
         }
 
-        setErrors(newErrors);
+        setErrors(newErrors)
 
         return Object.keys(newErrors).length === 0 
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        if (!validateForm()) return;
+        if (!validateForm()) return
 
         try {
-            setIsLoading(true);
-            setApiError("");
+            setIsLoading(true)
+            setApiError("")
 
-            const response = await axios.post(
+            const response = await api.post(
                 `
-                /api/v1/session/start-interview`,
+                /api/v1/interview/start-interview`,
                 {
                     topic: formData.topic,
                     difficulty: formData.difficulty,
                     role: formData.role,
                 },
-                {
-                    withCredentials: true,
-                }
+                 
             );
 
             const { sessionId, question } = response.data 
@@ -119,7 +117,7 @@ export default function InterviewSetup() {
                 },
             });
         } catch (error) {
-            console.error("Failed to start interview:", error);
+            console.error("Failed to start interview:", error)
 
             setApiError(
                 error.response?.data?.message ||
