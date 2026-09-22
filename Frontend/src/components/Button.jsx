@@ -9,7 +9,7 @@ export default function Button({
 
     const baseStyles= "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 
-    const variant={
+    const variants={
          primary: "bg-indigo-600 text-white hover:bg-indigo-500",
     secondary: "bg-gray-800 text-gray-200 border border-gray-700 hover:bg-gray-700",
     danger: "bg-red-600 text-white hover:bg-red-500",
