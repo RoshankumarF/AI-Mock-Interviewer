@@ -130,6 +130,7 @@ const logout=asyncHandler(async(req,res)=>{
 })
 
 const getCurrentUser=asyncHandler(async(req,res)=>{
+   
     const user = await User.findById(req.user._id).select("-password");
         
         if (!user) {
@@ -144,5 +145,6 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
 export {
     register,
     login,
-    logout
+    logout,
+    getCurrentUser
 }

@@ -19,7 +19,7 @@ export default function Button({
     const isDisabled =isloading||disabled
 
     return (
-        <button className={`${baseStyles} ${veriant}  ${isDisabled ? 'opacity-70 cursor-not-allowed' : '' } ${className} `} disabled={isDisabled}
+        <button className={`${baseStyles} ${variants}  ${isDisabled ? 'opacity-70 cursor-not-allowed' : '' } ${className} `} disabled={isDisabled}
         {...props}
         >
             

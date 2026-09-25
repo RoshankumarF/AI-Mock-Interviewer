@@ -1,89 +1,106 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { api } from "../api"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { api } from "../api";
 
-import Input from "../components/Input"
-import Button from "../components/Button"
+import Input from "../components/Input";
+import Button from "../components/Button";
 
-export default function Login({setIsLoggined}) {
-    const navigate = useNavigate()
+export default function Register() {
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        username:"",
+       username: "",
         email: "",
         password: "",
-    })
+        confirmPassword: "",
+    });
 
-    const [error, setError] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
-        const { name, value } = e.target
+        const { name, value } = e.target;
 
         setFormData((prev) => ({
             ...prev,
             [name]: value,
-        }))
+        }));
 
-        // Remove old error when user starts typing again
         if (error) {
-            setError("")
+            setError("");
         }
-    }
+    };
+
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+ 
 
-       
-
-        if (!formData.email.trim() || !formData.password ) {
-            setError("Please enter your email and password.")
-            return
+        if (
+            !formData.username.trim() ||
+            !formData.email.trim() ||
+            !formData.password ||
+            !formData.confirmPassword
+        ) {
+            setError("Please fill in all fields.");
+            return;
         }
 
+
+        if (formData.password.length < 6) {
+            setError("Password must be at least 6 characters.");
+            return;
+        }
+
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
+
         try {
-            setIsLoading(true)
-            setError("")
-
-            const response = await api.post(
-                "/v1/user/login",
-                {
-                    email: formData.email.trim(),
-                    password: formData.password,
-                    username:formData.username
-                },
-                 
-            )
-
-             
+            setIsLoading(true);
+            setError("");
 
            
-          setIsLoggined(true);
-            navigate("/dashboard")
+
+            const response = await api.post(
+                "/v1/user/register",
+                {
+                    username: formData.username.trim(),
+                    email: formData.email.trim(),
+                    password: formData.password,
+                },
+                
+            );
+
+            console.log("Registration successful:", response.data);
+
+ 
+
+            navigate("/login");
 
         } catch (error) {
-            setIsLoggined(false)
-            console.error("Login error:", error)
+            console.error("Registration error:", error);
 
             setError(
                 error.response?.data?.message ||
-                "Unable to login. Please check your credentials."
-            )
+                "Unable to create your account. Please try again."
+            );
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
+
 
     return (
         <div className="min-h-screen bg-[#0B0F19] text-gray-100">
 
-           
-
             <main className="flex min-h-screen items-center justify-center px-6 py-12">
 
                 <div className="w-full max-w-md">
-
-                
+ 
 
                     <div className="mb-8 text-center">
 
@@ -96,25 +113,25 @@ export default function Login({setIsLoggined}) {
 
                     </div>
 
-
-                 
+ 
 
                     <div className="rounded-2xl border border-gray-800 bg-gray-900 p-8">
 
-                      
+                        {/* Heading */}
 
                         <div>
+
                             <h1 className="text-2xl font-semibold">
-                                Welcome back
+                                Create your account
                             </h1>
 
                             <p className="mt-2 text-sm text-gray-500">
-                                Continue your interview preparation.
+                                Start practicing smarter.
                             </p>
+
                         </div>
 
-
-                     
+ 
 
                         {error && (
                             <div className="mt-6 rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
@@ -127,12 +144,25 @@ export default function Login({setIsLoggined}) {
                         )}
 
 
-                        {/* Form */}
-
+                      
                         <form
                             onSubmit={handleSubmit}
                             className="mt-8 space-y-5"
                         >
+
+                            {/* username */}
+
+                            <Input
+                                label="username"
+                                name="username"
+                                type="text"
+                                placeholder="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                autoComplete="name"
+                                disabled={isLoading}
+                            />
+
 
                             {/* Email */}
 
@@ -147,19 +177,6 @@ export default function Login({setIsLoggined}) {
                                 disabled={isLoading}
                             />
 
-                            {/* Username */}
-
-                            <Input
-                                label="username"
-                                name="username"
-                                type="username"
-                                placeholder="you123"
-                                value={formData.username}
-                                onChange={handleChange}
-                                autoComplete="username"
-                                disabled={isLoading}
-                            />
-
 
                             {/* Password */}
 
@@ -167,57 +184,61 @@ export default function Login({setIsLoggined}) {
                                 label="Password"
                                 name="password"
                                 type="password"
-                                placeholder="Enter your password"
+                                placeholder="At least 6 characters"
                                 value={formData.password}
                                 onChange={handleChange}
-                                autoComplete="current-password"
+                                autoComplete="new-password"
                                 disabled={isLoading}
                             />
 
 
-                            {/* Forgot password */}
+                            {/* Confirm password */}
 
-                            <div className="flex justify-end">
-
-                                <Link
-                                    to="/forgot-password"
-                                    className="text-xs text-gray-500 transition hover:text-indigo-400"
-                                >
-                                    Forgot password?
-                                </Link>
-
-                            </div>
+                            <Input
+                                label="Confirm Password"
+                                name="confirmPassword"
+                                type="password"
+                                placeholder="Re-enter your password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                autoComplete="new-password"
+                                disabled={isLoading}
+                            />
 
 
                             {/* Submit */}
 
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                isLoading={isLoading}
-                                disabled={isLoading}
-                            >
-                                {isLoading
-                                    ? "Signing in..."
-                                    : "Sign In"}
-                            </Button>
+                            <div className="pt-2">
+
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    isLoading={isLoading}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading
+                                        ? "Creating account..."
+                                        : "Create Account"}
+                                </Button>
+
+                            </div>
 
                         </form>
 
 
-                        {/* Register */}
+                      
 
                         <div className="mt-8 border-t border-gray-800 pt-6 text-center">
 
                             <p className="text-sm text-gray-500">
-                                Don't have an account?
+                                Already have an account?
                             </p>
 
                             <Link
-                                to="/register"
+                                to="/login"
                                 className="mt-2 inline-block text-sm font-medium text-indigo-400 transition hover:text-indigo-300"
                             >
-                                Create an account →
+                                Sign in →
                             </Link>
 
                         </div>
@@ -243,5 +264,5 @@ export default function Login({setIsLoggined}) {
             </main>
 
         </div>
-    )
+    );
 }
