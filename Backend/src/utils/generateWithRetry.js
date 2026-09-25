@@ -1,6 +1,6 @@
 import { model } from "mongoose";
 
-const generateWithRetry=async(model,prompt,retries=3)=>{
+const generateWithRetry=async(model,prompt,retries=5)=>{
     for(let i=0;i<retries;i++){
         try {
             const result=await model.generateContent(prompt)

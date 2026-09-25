@@ -33,8 +33,8 @@ export default function Interview() {
 
             
 
-            const response = await axios.post(
-                ` /api/v1/interview/submit-answer/${sessionId}`,
+            const response = await api.post(
+                `/v1/interview/submit-answer/${sessionId}`,
                 {
                     answer: answer.trim(),
                 },

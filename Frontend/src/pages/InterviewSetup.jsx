@@ -99,8 +99,7 @@ export default function InterviewSetup() {
             setApiError("")
 
             const response = await api.post(
-                `
-                /api/v1/interview/start-interview`,
+                `/v1/interview/start-interview`,
                 {
                     topic: formData.topic,
                     difficulty: formData.difficulty,

@@ -37,12 +37,12 @@ function App() {
 
         <Route
     path="/interview/:sessionId"
-    element={<InterviewSetup />}
+    element={<Interview/>}
 />
 
 <Route
     path="/interview/:sessionId/feedback"
-    element={<Interview />}
+    element={<InterviewResult />}
 />
 
 <Route

@@ -88,7 +88,7 @@ const submitAnswer=asyncHandler(async(req,res)=>{
 
 `
 
-  const rawFeedback = await generateWithRetry(model, evalPrompt);
+  const rawFeedback = await generateWithRetry(model, evalprompt);
 
   let feedback;
   try {
@@ -120,7 +120,7 @@ const submitAnswer=asyncHandler(async(req,res)=>{
    const nextPrompt = `
       Ask a ${session.difficulty} level interview question about ${session.topic}.
       The candidate is a ${session.role}.
-      This is question ${questionsAsked + 1} of ${MAX_QUESTIONS}.
+      This is question ${questionAsked+ 1} of ${MAXQ}.
 
       Do NOT repeat or closely resemble these already-asked questions:
       - ${askedSoFar}
@@ -141,7 +141,7 @@ const submitAnswer=asyncHandler(async(req,res)=>{
   res.json({
     feedback,
     nextQuestion,        
-    questionsAsked,
+    questionAsked,
     isLastQuestion,       
   })
 
