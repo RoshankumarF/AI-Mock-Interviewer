@@ -1,12 +1,34 @@
 import { useState } from 'react'
- 
+import { BrowserRouter } from 'react-router-dom'
+import Interview from './pages/Interview'
+import InterviewResult from './pages/Result'
+import InterviewSetup from './pages/InterviewSetup'
+
+
 
 function App() {
  
 
   return (
     <>
-      <h1 className='items-center-safe text-3xl text-red-600'> Hello there welcome to interview prep</h1>
+      <BrowserRouter>
+      <Routes>
+        <Route
+    path="/interview/:sessionId"
+    element={<Interview />}
+/>
+
+<Route
+    path="/interview/:sessionId/feedback"
+    element={<InterviewFeedback />}
+/>
+
+<Route
+    path="/interview/:sessionId/result"
+    element={<InterviewResult />}
+/>
+      </Routes>
+      </BrowserRouter>
     </>
   )
 }
