@@ -1,8 +1,92 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import  {api} from "../api"
 
 export default function Home() {
+        const navigate = useNavigate()
+
+    const [user, setUser] = useState(null)
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+    const [isLoggingOut, setIsLoggingOut] = useState(false)
+ 
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await api.get(
+                    "/v1/user/current-user",
+                     
+                )
+
+                setUser(response.data.data || response.data.user)
+
+            } catch (error) {
+
+                
+
+                if (error.response?.status === 401) {
+                    setUser(null)
+                } else {
+                    console.error("Auth check failed:", error)
+                    setUser(null)
+                }
+
+            } finally {
+                setIsCheckingAuth(false)
+            }
+        }
+
+        checkAuth()
+    }, [])
+
+
+    
+
+    const handleLogout = async () => {
+        try {
+            setIsLoggingOut(true)
+
+            await api.patch(
+                "/v1/user/logout",
+                
+                
+               
+            )
+
+            setUser(null)
+
+            navigate("/")
+
+        } catch (error) {
+            console.error("Logout failed:", error)
+
+        } finally {
+            setIsLoggingOut(false)
+        }
+    }
+
+
+    
+
+    if (isCheckingAuth) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#0B0F19]">
+
+                <div className="text-center">
+
+                    <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-gray-700 border-t-indigo-500" />
+
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading...
+                    </p>
+
+                </div>
+
+            </div>
+        )
+    }
+
+
+    const isLoggedIn = !!user
  
 return (
         <div className="min-h-screen bg-[#0B0F19] text-gray-100">
@@ -556,7 +640,7 @@ return (
             </footer>
 
         </div>
-    );
+    )
 }
 
 
@@ -578,7 +662,7 @@ function Feature({ title, description }) {
             </p>
 
         </div>
-    );
+    )
 }
 
 
@@ -603,5 +687,5 @@ function Step({ number, title, description }) {
             </p>
 
         </div>
-    );
+    )
 }
