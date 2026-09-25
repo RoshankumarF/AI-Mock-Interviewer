@@ -27,6 +27,7 @@ const generateAccessAndRefreshToken=async(userId)=>{
 
 
 const register=asyncHandler(async(req,res)=>{
+    
     const {username,email,password}=req.body
 
     if(!(username || email ||password)){
@@ -56,6 +57,7 @@ const register=asyncHandler(async(req,res)=>{
 })
 
 const login=asyncHandler(async(req,res)=>{
+     
      const {email,username,password}=req.body
        if(!(username||email)){
         throw new apiError(400,"username or email is required")
@@ -125,6 +127,18 @@ const logout=asyncHandler(async(req,res)=>{
       .json(new apiResponse(200,{},"user logged out successfully"))
     
 
+})
+
+const getCurrentUser=asyncHandler(async(req,res)=>{
+    const user = await User.findById(req.user._id).select("-password");
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+     
+        res.status(200).json(new apiResponse(200,user,"user fetched successfully"));
+    
 })
 
 export {
