@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
+import { api } from "../api"
 
-import Input from "../components/ui/Input"
-import Button from "../components/ui/Button"
+import Input from "../components/Input"
+import Button from "../components/Button"
 
 export default function Login() {
     const navigate = useNavigate()
@@ -45,7 +45,7 @@ export default function Login() {
             setIsLoading(true)
             setError("")
 
-            const response = await axios.post(
+            const response = await api.post(
                 ` /v1/user/login`,
                 {
                     email: formData.email.trim(),
