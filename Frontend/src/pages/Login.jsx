@@ -59,7 +59,7 @@ export default function Login({setIsLoggined}) {
 
            
           setIsLoggined(true);
-            navigate("/dashboard")
+            navigate("/")
 
         } catch (error) {
             setIsLoggined(false)

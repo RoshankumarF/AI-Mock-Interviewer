@@ -34,6 +34,10 @@ function App() {
     element={< Register/>}
 />
 
+ <Route
+    path="/interview/setup"
+    element={< InterviewSetup/>}
+/>
 
         <Route
     path="/interview/:sessionId"
