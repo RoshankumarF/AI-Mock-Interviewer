@@ -130,17 +130,7 @@ return (
 
                             <div className="flex items-center gap-3">
 
-                                <Link
-                                    to="/dashboard"
-                                    className="
-                                        text-sm
-                                        text-gray-300
-                                        transition
-                                        hover:text-white
-                                    "
-                                >
-                                    Dashboard
-                                </Link>
+                                 
 
                                 <Link
                                     to="/profile"
